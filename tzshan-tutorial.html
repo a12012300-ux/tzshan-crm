@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>臻善集團 管理系統操作教學</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
+:root {
+  --gold: #8a6d3b;
+  --gold2: #c9a96e;
+  --goldlight: #f5ede0;
+  --bg: #faf8f4;
+  --bg2: #ffffff;
+  --text: #2c2620;
+  --text2: #6b5f54;
+  --text3: #a89e94;
+  --green: #2e7d52;
+  --border: #e2ddd6;
+  --shadow: 0 4px 24px rgba(138,109,59,0.10);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  font-family: 'Noto Sans TC', sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--text);
+  color: var(--goldlight);
+  padding: 28px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+
+.header-logo {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 20px;
+  letter-spacing: 0.3em;
+  color: var(--gold2);
+  font-weight: 400;
+}
+
+.header-sub {
+  font-size: 12px;
+  color: var(--text3);
+  letter-spacing: 0.2em;
+  margin-top: 4px;
+}
+
+.header-nav {
+  display: flex;
+  gap: 6px;
+}
+
+.nav-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #444;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid #666;
+}
+
+.nav-dot.active { background: var(--gold2); border-color: var(--gold2); }
+
+/* ── SLIDES ── */
+.slides-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.slide {
+  display: none;
+  animation: slideIn 0.35s ease;
+}
+
+.slide.active { display: block; }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SLIDE TYPES ── */
+
+/* COVER */
+.slide-cover {
+  text-align: center;
+  padding: 60px 40px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.slide-cover::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+}
+
+.cover-badge {
+  display: inline-block;
+  background: var(--goldlight);
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  padding: 6px 20px;
+  border: 1px solid var(--gold2);
+  margin-bottom: 24px;
+}
+
+.cover-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  color: var(--text);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.cover-title span { color: var(--gold); }
+
+.cover-desc {
+  font-size: 16px;
+  color: var(--text2);
+  line-height: 1.8;
+  max-width: 500px;
+  margin: 0 auto 32px;
+}
+
+.cover-url {
+  display: inline-block;
+  background: var(--text);
+  color: var(--gold2);
+  font-size: 13px;
+  padding: 10px 24px;
+  letter-spacing: 0.1em;
+  font-family: monospace;
+  border-radius: 2px;
+}
+
+/* CONTENT SLIDE */
+.slide-content {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.slide-top {
+  background: var(--text);
+  padding: 28px 36px;
+  position: relative;
+}
+
+.slide-top::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 36px;
+  width: 48px; height: 3px;
+  background: var(--gold2);
+}
+
+.slide-num {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.3em;
+  margin-bottom: 8px;
+}
+
+.slide-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 300;
+  color: var(--goldlight);
+  letter-spacing: 0.1em;
+}
+
+.slide-body {
+  padding: 32px 36px;
+}
+
+/* STEP LIST */
+.step-list { list-style: none; }
+
+.step-item {
+  display: flex;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+
+.step-item:last-child { border-bottom: none; }
+
+.step-num {
+  width: 36px;
+  height: 36px;
+  background: var(--gold);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  flex-shrink: 0;
+  font-family: 'Noto Serif TC', serif;
+}
+
+.step-content { flex: 1; }
+
+.step-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.step-desc {
+  font-size: 15px;
+  color: var(--text2);
+  line-height: 1.8;
+}
+
+.step-tip {
+  display: inline-block;
+  background: var(--goldlight);
+  color: var(--gold);
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 2px;
+  margin-top: 6px;
+  border: 1px solid #dfd0b8;
+}
+
+/* FEATURE GRID */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.feature-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 3px;
+  transition: border-color 0.2s;
+}
+
+.feature-card:hover { border-color: var(--gold); }
+
+.feature-icon {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.feature-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.feature-desc {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+/* FIELD TABLE */
+.field-table { width: 100%; border-collapse: collapse; }
+.field-table th {
+  background: var(--text);
+  color: var(--goldlight);
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  font-weight: 500;
+}
+.field-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+  vertical-align: top;
+}
+.field-table tr:last-child td { border-bottom: none; }
+.field-table tr:hover td { background: var(--bg); }
+
+.tag {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  margin-left: 6px;
+}
+.tag-must { background: #fde8e8; color: #c0392b; border: 1px solid #f5c6c6; }
+.tag-opt { background: var(--goldlight); color: var(--gold); border: 1px solid #dfd0b8; }
+
+/* COST DEMO */
+.cost-demo {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.cost-row {
+  display: flex;
+  align-items: center;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  font-size: 15px;
+}
+
+.cost-row:last-child { border-bottom: none; }
+
+.cost-badge {
+  font-size: 11px;
+  padding: 2px 10px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.badge-std { background: var(--goldlight); color: var(--gold); border: 1px solid #dfd0b8; }
+.badge-opt { background: #eaf5ee; color: var(--green); border: 1px solid #b8dfc8; }
+
+.cost-name { flex: 1; }
+.cost-price { color: var(--gold); font-family: 'Noto Serif TC', serif; font-weight: 600; }
+
+.cost-summary {
+  background: var(--text);
+  display: flex;
+  justify-content: space-around;
+  padding: 16px;
+}
+
+.cost-sum-item { text-align: center; }
+.cost-sum-label { font-size: 11px; color: var(--text3); letter-spacing: 0.15em; margin-bottom: 4px; }
+.cost-sum-val { font-family: 'Noto Serif TC', serif; font-size: 20px; color: var(--gold2); }
+.cost-sum-val.green { color: #4caf82; }
+
+/* WARNING BOX */
+.warn-box {
+  background: #fff8e6;
+  border: 1px solid #f0d080;
+  border-left: 4px solid #e6a800;
+  padding: 16px 20px;
+  border-radius: 2px;
+  margin-top: 16px;
+}
+
+.warn-title { font-size: 15px; font-weight: 600; color: #7a5500; margin-bottom: 6px; }
+.warn-text { font-size: 14px; color: #8a6500; line-height: 1.7; }
+
+.info-box {
+  background: #eaf5ee;
+  border: 1px solid #b8dfc8;
+  border-left: 4px solid var(--green);
+  padding: 16px 20px;
+  border-radius: 2px;
+  margin-top: 16px;
+}
+
+.info-title { font-size: 15px; font-weight: 600; color: #1a5c36; margin-bottom: 6px; }
+.info-text { font-size: 14px; color: #2a6b42; line-height: 1.7; }
+
+/* ── FOOTER NAV ── */
+.footer-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0 0;
+}
+
+.slide-counter {
+  font-size: 13px;
+  color: var(--text3);
+  letter-spacing: 0.15em;
+}
+
+.nav-btns { display: flex; gap: 10px; }
+
+.nav-btn {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 10px 24px;
+  font-size: 14px;
+  font-family: 'Noto Sans TC', sans-serif;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+  letter-spacing: 0.08em;
+}
+
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.primary { background: var(--gold); color: #fff; border-color: var(--gold); font-weight: 500; }
+.nav-btn.primary:hover { background: #6d5230; }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* SEARCH DEMO */
+.search-demo {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 16px;
+  margin: 12px 0;
+}
+
+.search-box-demo {
+  display: flex;
+  align-items: center;
+  background: var(--bg2);
+  border: 2px solid var(--gold);
+  padding: 10px 16px;
+  gap: 10px;
+  border-radius: 2px;
+  margin-bottom: 12px;
+}
+
+.search-icon-demo { font-size: 16px; }
+.search-text-demo { font-size: 15px; color: var(--text2); }
+
+.search-result-demo {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  border-radius: 2px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.search-result-demo:last-child { margin-bottom: 0; }
+
+.sr-main { font-size: 15px; font-weight: 600; color: var(--text); }
+.sr-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.sr-tag { font-size: 12px; color: var(--gold); background: var(--goldlight); padding: 3px 10px; border: 1px solid #dfd0b8; }
+
+/* PROGRESS */
+.progress-bar {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-bottom: 32px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+@media (max-width: 600px) {
+  .feature-grid { grid-template-columns: 1fr; }
+  .header { padding: 20px; }
+  .slide-body { padding: 20px; }
+  .slide-top { padding: 20px; }
+  .slides-wrap { padding: 20px 16px 60px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">臻善集團</div>
+    <div class="header-sub">管理系統操作教學</div>
+  </div>
+  <div class="header-nav" id="nav-dots"></div>
+</div>
+
+<div class="slides-wrap">
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+
+  <!-- SLIDE 1: 封面 -->
+  <div class="slide active" id="slide-1">
+    <div class="slide-cover">
+      <div class="cover-badge">INTERNAL SYSTEM GUIDE</div>
+      <div class="cover-title">
+        <span>臻善集團</span><br>管理系統操作教學
+      </div>
+      <div class="cover-desc">
+        本教學將引導您完整使用內部案件管理系統，包含新增案件、查詢客戶、追蹤介紹人及財務報表等功能。
+      </div>
+      <div class="cover-url">https://a12012300-ux.github.io/tzshan-crm/</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: 如何開啟系統 -->
+  <div class="slide" id="slide-2">
+    <div class="slide-content">
+      <div class="slide-top">
+        <div class="slide-num">STEP 01</div>
+        <div class="slide-title">如何開啟系統</div>
+      </div>
+      <div class="slide-body">
+        <ul class="step-list">
+          <li class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">打開手機或電腦的瀏覽器</div>
+              <div class="step-desc">建議使用 Chrome 瀏覽器，效果最佳。</div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">輸入網址</div>
+              <div class="step-desc" style="font-family:monospace; background:var(--bg); padding:10px 14px; border:1px solid var(--border); border-radius:2px; margin-top:6px; font-size:14px; color:var(--gold);">
+                https://a12012300-ux.github.io/tzshan-crm/
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">加入書籤，方便下次快速開啟</div>
+              <div class="step-desc">電腦：按星星圖示 ★ 加入書籤<br>手機：點右下角選單 → 加入主畫面</div>
+              <span class="step-tip">💡 建議加到主畫面，像 App 一樣方便</span>
+            </div>
+          </li>
+        </ul>
+        <div class="info-box">
+          <div class="info-title">✅ 手機、電腦都可以使用</div>
+          <div class="info-text">系統已針對手機版優化，外出時也能查詢案件資料。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: 系統功能總覽 -->
+  <div class="slide" id="slide-3">
+    <div class="slide-content">
+      <div class="slide-top">
+        <div class="slide-num">STEP 02</div>
+        <div class="slide-title">系統六大功能</div>
+      </div>
+      <div class="slide-body">
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">▦</div>
+            <div class="feature-name">總覽儀表板</div>
+            <div class="feature-desc">顯示本月案件數、總收入、淨利，一眼掌握業績狀況。</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">◈</div>
+            <div class="feature-name">案件管理</div>
+            <div class="feature-desc">新增、編輯、刪除案件，記錄完整資料與費用明細。</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">◉</div>
+            <div class="feature-name">客戶資料</div>
+            <div class="feature-desc">所有家屬聯絡人的通訊地址與聯絡方式。</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <div class="feature-name">進階搜尋</div>
+            <div class="feature-desc">輸入任何關鍵字，快速找到任何案件或客戶。</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">◎</div>
+            <div class="feature-name">介紹人追蹤</div>
+            <div class="feature-desc">查詢誰介紹了哪些客戶，掌握口碑來源。</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">◆</div>
+            <div class="feature-name">財務報表</div>
+            <div class="feature-desc">每個案件的收費、成本、淨利、利潤率一覽表。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: 新增案件（往生者資料） -->
+  <div class="slide" id="slide-4">
+    <div class="slide-content">
+      <div class="slide-top">
+        <div class="slide-num">STEP 03</div>
+        <div class="slide-title">新增案件 — 往生者資料</div>
+      </div>
+      <div class="slide-body">
+        <p style="font-size:15px; color:var(--text2); margin-bottom:18px;">點右上角 <strong style="color:var(--gold)">＋ 新增案件</strong> 按鈕，開啟填寫表單。</p>
+        <table class="field-table">
+          <thead><tr><th>欄位名稱</th><th>說明</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>往生者姓名</strong><span class="tag tag-must">必填</span></td>
+              <td>往生者的全名</td>
+            </tr>
+            <tr>
+              <td><strong>往生日期</strong><span class="tag tag-must">必填</span></td>
+              <td>往生當天的日期</td>
+            </tr>
+            <tr>
+              <td><strong>性別 / 享年</strong><span class="tag tag-opt">選填</span></td>
+              <td>性別選男或女，享年填歲數</td>
+            </tr>
+            <tr>
+              <td><strong>宗教信仰</strong><span class="tag tag-opt">選填</span></td>
+              <td>道教、佛教、基督教、無</td>
+            </tr>
+            <tr>
+              <td><strong>案件狀態</strong><span class="tag tag-must">必填</span></td>
+              <td>進行中 / 待確認 / 已完成</td>
+            </tr>
+            <tr>
+              <td><strong>往生者原住址</strong><span class="tag tag-opt">選填</span></td>
+              <td>往生者生前居住地址</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: 新增案件（家屬資料） -->
+  <div class="slide" id="slide-5">
+    <div class="slide-content">
+      <div class="slide-top">
+        <div class="slide-num">STEP 04</div>
+        <div class="slide-title">新增案件 — 家屬聯絡人</div>
+      </div>
+      <div class="slide-body">
+        <table class="field-table">
+          <thead><tr><th>欄位名稱</th><th>說明</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>家屬姓名</strong><span class="tag tag-must">必填</span></td>
+              <td>主要聯絡家屬的姓名</td>
+            </tr>
+            <tr>
+              <td><strong>與往生者關係</strong><span class="tag tag-opt">選填</span></td>
+              <td>例如：長子、長女、配偶</td>
+            </tr>
+            <tr>
+              <td><strong>聯絡電話</strong><span class="tag tag-must">必填</span></td>
+              <td>家屬手機號碼</td>
+            </tr>
+            <tr>
+              <td><strong>介紹人</strong><span class="tag tag-opt">選填</span></td>
+              <td>是誰介紹這個客戶的，若無則留空</td>
+            </tr>
+            <tr>
+              <td><strong>家屬通訊地址</strong><span class="tag tag-opt">選填</span></td>
+              <td>寄感謝卡、訃聞用的地址</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="warn-box">
+          <div class="warn-title">⚠️ 介紹人欄位非常重要</div>
+          <div class="warn-text">填寫介紹人後，系統會自動統計每位介紹人帶來的案件數和收入，方便做客情維護。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: 費用明細 -->
+  <div class="slide" id="slide-6">
+    <div class="slide-content">
+      <div class="slide-top">
+        <div class="slide-num">STEP 05</div>
+        <div class="slide-title">新增案件 — 費用明細</div>
+      </div>
+      <div class="slide-body">
+        <p style="font-size:15px; color:var(--text2); margin-bottom:16px;">費用分為<strong style="color:var(--gold)">標配</strong>（基本必備）和<strong style="color:var(--green)">選配</strong>（家屬自選）兩種，每項填入收費和成本，系統自動計算淨利。</p>
+        <div class="cost-demo">
+          <div class="cost-row"><span class="cost-badge badge-std">標配</span><span class="cost-name">接體運送</span><span class="cost-price">$8,000</span></div>
+          <div class="cost-row"><span class="cost-badge badge-std">標配</span><span class="cost-name">棺木（上等柚木）</span><span class="cost-price">$25,000</span></div>
+          <div class="cost-row"><span class="cost-badge badge-std">標配</span><span class="cost-name">禮廳租借（3天）</span><span class="cost-price">$30,000</span></div>
+          <div class="cost-row"><span class="cost-badge badge-std">標配</span><span class="cost-name">火化費用</span><span class="cost-price">$8,000</span></div>
+          <div class="cost-row"><span class="cost-badge badge-opt">選配</span><span class="cost-name">頭七法會</span><span class="cost-price">$12,000</span></div>
+          <div class="cost-row"><span class="cost-badge badge-opt">選配</span><span class="cost-name">花藝佈置升級</span><span class="cost-price">$12,000</span></div>
+          <div class="cost-summary">
+            <div class="cost-sum-item"><div class="cost-sum-label">總收費</div><div class="cost-sum-val">$115,000</div></div>
+            <div class="cost-sum-item"><div class="cost-sum-label">總成本</div><div class="cost-sum-val">$58,000</div></div>
+            <div class="cost-sum-item"><div class="cost-sum-label">預估淨利</div><div class="cost-sum-val green">$57,000</div></div>
+          </div>
+        </div>
+        <p style="font-size:13px; color:var(--text3); margin-top:10px;">💡 可點「＋ 新增項目」自行新增費用項目</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: 搜尋功能 -->
+  <div class="slide" id="slide-7">
+    <div class="slide-content">
+      <div class="slide-top">
+        <div class="slide-num">STEP 06</div>
+        <div class="slide-title">搜尋功能說明</div>
+      </div>
+      <div class="slide-body">
+        <p style="font-size:15px; color:var(--text2); margin-bottom:16px;">有三種方式可以快速找到案件：</p>
+        <ul class="step-list">
+          <li class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">頂部全域搜尋框（最快）</div>
+              <div class="step-desc">任何頁面都能用，輸入名字馬上顯示結果。</div>
+              <div class="search-demo">
+                <div class="search-box-demo">
+                  <span class="search-icon-demo">🔍</span>
+                  <span class="search-text-demo">林太太...</span>
+                </div>
+                <div class="search-result-demo">
+                  <div><div class="sr-main">李文雄 ／ 李雅婷</div><div class="sr-sub">TZ-2025003 · 林太太介紹</div></div>
+                  <span class="sr-tag">$142,000</span>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">進階搜尋頁</div>
+              <div class="step-desc">左側選單點「進階搜尋」，可同時用多個條件篩選，還可以選日期範圍。</div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">案件管理頁篩選</div>
+              <div class="step-desc">可按狀態（進行中/已完成/待確認）、介紹人、金額範圍篩選。</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: 介紹人追蹤 -->
+  <div class="slide" id="slide-8">
+    <div class="slide-content">
+      <div class="slide-top">
+        <div class="slide-num">STEP 07</div>
+        <div class="slide-title">介紹人追蹤</div>
+      </div>
+      <div class="slide-body">
+        <p style="font-size:15px; color:var(--text2); margin-bottom:18px;">當朋友說「某某某介紹我來的」，你可以馬上查到這位介紹人所有的案件記錄。</p>
+        <ul class="step-list">
+          <li class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">點左側選單「介紹人追蹤」</div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">輸入介紹人姓名搜尋</div>
+              <div class="step-desc">系統會顯示他介紹了幾件、帶來多少收入、最近一次介紹日期，以及所有相關案件編號。</div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">點案件編號可直接跳到案件詳情</div>
+              <div class="step-desc">快速查看當時的完整記錄。</div>
+              <span class="step-tip">💡 可用於年節時主動聯繫、感謝常介紹的貴人</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: 注意事項 -->
+  <div class="slide" id="slide-9">
+    <div class="slide-content">
+      <div class="slide-top">
+        <div class="slide-num">STEP 08</div>
+        <div class="slide-title">重要注意事項</div>
+      </div>
+      <div class="slide-body">
+        <ul class="step-list">
+          <li class="step-item">
+            <div class="step-num" style="background:#c0392b">!</div>
+            <div class="step-content">
+              <div class="step-title">資料存在瀏覽器裡，不要清除瀏覽器資料</div>
+              <div class="step-desc">如果在設定裡清除 Cookie 或網站資料，所有案件記錄會消失。平時不要點「清除瀏覽紀錄」。</div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num" style="background:#c0392b">!</div>
+            <div class="step-content">
+              <div class="step-title">建議固定用同一台裝置</div>
+              <div class="step-desc">手機存的資料不會自動同步到電腦，建議指定一台主要裝置（例如辦公室電腦）來管理。</div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-num">✓</div>
+            <div class="step-content">
+              <div class="step-title">每次新增完案件記得確認已儲存</div>
+              <div class="step-desc">點「儲存案件」按鈕後，在案件管理頁確認新案件有出現在列表中。</div>
+            </div>
+          </li>
+        </ul>
+        <div class="warn-box">
+          <div class="warn-title">⚠️ 定期備份提醒</div>
+          <div class="warn-text">目前版本資料存在本機瀏覽器，建議每月截圖財務報表留存備份，避免意外資料遺失。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: 結尾 -->
+  <div class="slide" id="slide-10">
+    <div class="slide-cover">
+      <div class="cover-badge">COMPLETE</div>
+      <div class="cover-title">教學完成 🎉</div>
+      <div class="cover-desc">
+        恭喜您完成系統操作教學！<br><br>
+        如有任何操作問題，請洽負責人協助。<br>
+        系統持續更新中，功能會越來越完善。
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px; align-items:center; margin-top:8px;">
+        <div class="cover-url">https://a12012300-ux.github.io/tzshan-crm/</div>
+        <div style="font-size:13px; color:var(--text3); letter-spacing:0.15em;">臻善集團 內部管理系統 v2.0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Navigation -->
+  <div class="footer-nav">
+    <div class="slide-counter" id="slide-counter">1 / 10</div>
+    <div class="nav-btns">
+      <button class="nav-btn" id="btn-prev" onclick="changeSlide(-1)" disabled>← 上一頁</button>
+      <button class="nav-btn primary" id="btn-next" onclick="changeSlide(1)">下一頁 →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let current = 1;
+const total = 10;
+
+function updateUI() {
+  // Slides
+  document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+  document.getElementById('slide-' + current).classList.add('active');
+
+  // Counter
+  document.getElementById('slide-counter').textContent = current + ' / ' + total;
+
+  // Progress
+  document.getElementById('progress').style.width = (current / total * 100) + '%';
+
+  // Buttons
+  document.getElementById('btn-prev').disabled = current === 1;
+  document.getElementById('btn-next').disabled = current === total;
+  document.getElementById('btn-next').textContent = current === total ? '✓ 完成' : '下一頁 →';
+
+  // Nav dots
+  document.querySelectorAll('.nav-dot').forEach((d, i) => {
+    d.classList.toggle('active', i + 1 === current);
+  });
+}
+
+function changeSlide(dir) {
+  const next = current + dir;
+  if (next < 1 || next > total) return;
+  current = next;
+  updateUI();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goToSlide(n) {
+  current = n;
+  updateUI();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Build nav dots
+const dotsWrap = document.getElementById('nav-dots');
+for (let i = 1; i <= total; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'nav-dot' + (i === 1 ? ' active' : '');
+  dot.title = '第 ' + i + ' 頁';
+  dot.onclick = () => goToSlide(i);
+  dotsWrap.appendChild(dot);
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changeSlide(-1);
+});
+
+updateUI();
+</script>
+</body>
+</html>
