@@ -371,7 +371,55 @@ td.wrap { white-space: normal; }
     padding-top: 8px;
     border-top: 1px solid var(--border) !important;
   }
+
+  /* 手機底部導覽列 */
+  .mobile-bottom-nav {
+    display: flex !important;
+  }
+
+  /* 手機版主內容底部留空間給導覽列 */
+  .main {
+    padding-bottom: 70px;
+  }
 }
+
+/* 底部導覽列樣式 */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  z-index: 150;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+}
+
+.mob-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px 10px;
+  cursor: pointer;
+  color: var(--text3);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+  gap: 4px;
+  border-top: 2px solid transparent;
+}
+
+.mob-nav-item.active {
+  color: var(--gold);
+  border-top-color: var(--gold);
+  background: var(--goldlight);
+}
+
+.mob-nav-icon { font-size: 18px; line-height: 1; }
+.mob-nav-label { font-size: 10px; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -583,7 +631,33 @@ td.wrap { white-space: normal; }
   </div>
 </div>
 
-<!-- ADD/EDIT MODAL -->
+<!-- 手機底部導覽列 -->
+<div class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <div class="mob-nav-item active" onclick="showPageMob('dashboard', this)">
+    <span class="mob-nav-icon">▦</span>
+    <span class="mob-nav-label">總覽</span>
+  </div>
+  <div class="mob-nav-item" onclick="showPageMob('cases', this)">
+    <span class="mob-nav-icon">◈</span>
+    <span class="mob-nav-label">案件</span>
+  </div>
+  <div class="mob-nav-item" onclick="showPageMob('clients', this)">
+    <span class="mob-nav-icon">◉</span>
+    <span class="mob-nav-label">客戶</span>
+  </div>
+  <div class="mob-nav-item" onclick="showPageMob('search', this)">
+    <span class="mob-nav-icon">🔍</span>
+    <span class="mob-nav-label">搜尋</span>
+  </div>
+  <div class="mob-nav-item" onclick="showPageMob('referral', this)">
+    <span class="mob-nav-icon">◎</span>
+    <span class="mob-nav-label">介紹人</span>
+  </div>
+  <div class="mob-nav-item" onclick="showPageMob('finance', this)">
+    <span class="mob-nav-icon">◆</span>
+    <span class="mob-nav-label">財務</span>
+  </div>
+</div>
 <div class="modal-overlay" id="addModal">
   <div class="modal">
     <div class="modal-header">
@@ -692,6 +766,20 @@ function showPage(name, el) {
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   if(el) el.classList.add('active');
+  renderAll();
+}
+
+function showPageMob(name, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.mob-nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  // 同步側邊選單高亮
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+name+"'")) n.classList.add('active');
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
   renderAll();
 }
 
