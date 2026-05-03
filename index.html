@@ -540,6 +540,7 @@ tr:hover td { background: #faf8f5; }
         <div class="form-group"><label class="form-label">享年</label><input class="form-input" type="number" id="f-age" placeholder="歲"></div>
         <div class="form-group"><label class="form-label">宗教信仰</label><select class="form-select" id="f-religion"><option>道教</option><option>佛教</option><option>基督教</option><option>無（簡約）</option></select></div>
         <div class="form-group"><label class="form-label">案件狀態</label><select class="form-select" id="f-status"><option>進行中</option><option>待確認</option><option>已完成</option></select></div>
+        <div class="form-group form-full"><label class="form-label">往生者原住址</label><input class="form-input" type="text" id="f-deceased-addr" placeholder="例：桃園市中壢區○○路○○號"></div>
       </div>
       <div class="form-section">家屬聯絡人</div>
       <div class="form-grid">
@@ -547,6 +548,7 @@ tr:hover td { background: #faf8f5; }
         <div class="form-group"><label class="form-label">與往生者關係</label><input class="form-input" type="text" id="f-relation" placeholder="例：長子"></div>
         <div class="form-group"><label class="form-label">聯絡電話 *</label><input class="form-input" type="tel" id="f-phone" placeholder="09xx-xxx-xxx"></div>
         <div class="form-group"><label class="form-label">介紹人</label><input class="form-input" type="text" id="f-referral" placeholder="介紹人姓名（無則留空）"></div>
+        <div class="form-group form-full"><label class="form-label">家屬通訊地址（寄訃聞／感謝卡用）</label><input class="form-input" type="text" id="f-contact-addr" placeholder="例：台北市大安區○○路○○號○樓"></div>
       </div>
       <div class="form-section">費用明細</div>
       <table class="cost-table">
@@ -873,7 +875,7 @@ const defaultItems = [
 ];
 
 function resetForm() {
-  ['f-deceased','f-date','f-contact','f-relation','f-phone','f-referral','f-note'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  ['f-deceased','f-date','f-contact','f-relation','f-phone','f-referral','f-note','f-deceased-addr','f-contact-addr'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('f-gender').value='男';
   document.getElementById('f-religion').value='道教';
   document.getElementById('f-status').value='進行中';
@@ -915,7 +917,7 @@ function saveCase() {
   if(!deceased||!contact||!phone||!date){alert('請填寫必填欄位（往生者姓名、家屬、電話、日期）');return;}
   const items=[];
   for(let i=0;i<costRowCount;i++){ const name=document.getElementById(`ci-name-${i}`)?.value?.trim(); if(!name) continue; items.push({name,type:document.getElementById(`ci-type-${i}`).value,price:Number(document.getElementById(`ci-price-${i}`).value||0),cost:Number(document.getElementById(`ci-cost-${i}`).value||0)}); }
-  const data={deceased,date,contact,phone,items,gender:document.getElementById('f-gender').value,age:document.getElementById('f-age').value,religion:document.getElementById('f-religion').value,status:document.getElementById('f-status').value,relation:document.getElementById('f-relation').value,referral:document.getElementById('f-referral').value.trim(),note:document.getElementById('f-note').value.trim()};
+  const data={deceased,date,contact,phone,items,gender:document.getElementById('f-gender').value,age:document.getElementById('f-age').value,religion:document.getElementById('f-religion').value,status:document.getElementById('f-status').value,relation:document.getElementById('f-relation').value,referral:document.getElementById('f-referral').value.trim(),note:document.getElementById('f-note').value.trim(),deceasedAddr:document.getElementById('f-deceased-addr').value.trim(),contactAddr:document.getElementById('f-contact-addr').value.trim()};
   if(editingId){ const idx=cases.findIndex(c=>c.id===editingId); cases[idx]={...cases[idx],...data}; }
   else { data.id='TZ-'+new Date().getFullYear()+String(cases.length+1).padStart(3,'0'); cases.unshift(data); }
   save(); closeModal('addModal'); renderAll();
@@ -930,6 +932,8 @@ function editCase(id) {
   document.getElementById('f-contact').value=c.contact; document.getElementById('f-relation').value=c.relation;
   document.getElementById('f-phone').value=c.phone; document.getElementById('f-referral').value=c.referral||'';
   document.getElementById('f-note').value=c.note||'';
+  document.getElementById('f-deceased-addr').value=c.deceasedAddr||'';
+  document.getElementById('f-contact-addr').value=c.contactAddr||'';
   loadCostRows(c.items); openModal('addModal');
 }
 
@@ -949,6 +953,7 @@ function showDetail(id) {
       <div><div class="detail-key">往生日期</div><div class="detail-val">${c.date}</div></div>
       <div><div class="detail-key">宗教信仰</div><div class="detail-val">${c.religion}</div></div>
       <div><div class="detail-key">狀態</div><div class="detail-val">${statusBadge(c.status)}</div></div>
+      <div style="grid-column:1/-1"><div class="detail-key">往生者原住址</div><div class="detail-val">${c.deceasedAddr||'<span style="color:var(--text3)">—</span>'}</div></div>
     </div>
     <div class="form-section">家屬聯絡人</div>
     <div class="detail-grid">
@@ -956,6 +961,7 @@ function showDetail(id) {
       <div><div class="detail-key">聯絡電話</div><div class="detail-val">${c.phone}</div></div>
       <div><div class="detail-key">介紹人</div><div class="detail-val">${c.referral||'自行來電'}</div></div>
       <div><div class="detail-key">備註</div><div class="detail-val">${c.note||'—'}</div></div>
+      <div style="grid-column:1/-1"><div class="detail-key">家屬通訊地址</div><div class="detail-val">${c.contactAddr||'<span style="color:var(--text3)">—</span>'}</div></div>
     </div>
     <div class="form-section">費用明細</div>
     <table style="width:100%;border-collapse:collapse;margin-bottom:12px;">
