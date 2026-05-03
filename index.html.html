@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>殯葬業務管理系統</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
+:root {
+  --bg: #f5f4f0;
+  --bg2: #ffffff;
+  --bg3: #f0ede8;
+  --border: #e2ddd6;
+  --border2: #d0c8be;
+  --gold: #8a6d3b;
+  --gold2: #6d5230;
+  --goldlight: #f5ede0;
+  --text: #2c2620;
+  --text2: #6b5f54;
+  --text3: #a89e94;
+  --green: #2e7d52;
+  --greenlight: #eaf5ee;
+  --blue: #2471a3;
+  --shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 13px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOPBAR */
+.topbar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+  gap: 16px;
+}
+
+.logo {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 15px;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  font-weight: 400;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.logo span { color: var(--text3); font-size: 10px; margin-left: 10px; font-family: 'Noto Sans TC', sans-serif; }
+
+/* GLOBAL SEARCH BAR in topbar */
+.global-search-wrap {
+  flex: 1;
+  max-width: 360px;
+  position: relative;
+}
+
+.global-search-input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 7px 12px 7px 34px;
+  font-size: 12px;
+  font-family: 'Noto Sans TC', sans-serif;
+  outline: none;
+  border-radius: 2px;
+  transition: border-color 0.15s;
+}
+.global-search-input:focus { border-color: var(--gold); background: var(--bg2); }
+.global-search-input::placeholder { color: var(--text3); }
+
+.global-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+/* Global search results dropdown */
+.global-results {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  z-index: 300;
+  max-height: 400px;
+  overflow-y: auto;
+  border-radius: 2px;
+}
+.global-results.open { display: block; }
+
+.gr-section-title {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--text3);
+  padding: 10px 14px 4px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+}
+
+.gr-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.gr-item:hover { background: var(--goldlight); }
+.gr-item:last-child { border-bottom: none; }
+
+.gr-main { font-size: 13px; color: var(--text); font-weight: 500; }
+.gr-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.gr-badge { font-size: 10px; color: var(--gold); background: var(--goldlight); padding: 2px 8px; border: 1px solid var(--border2); white-space: nowrap; border-radius: 2px; }
+
+.gr-empty { padding: 20px 14px; color: var(--text3); font-size: 12px; text-align: center; }
+
+/* LAYOUT */
+.layout { display: flex; flex: 1; }
+
+.sidebar {
+  width: 210px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 16px 0;
+  flex-shrink: 0;
+}
+
+.nav-item {
+  padding: 10px 20px;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+  margin: 1px 0;
+}
+.nav-item:hover { color: var(--gold); background: var(--goldlight); }
+.nav-item.active { color: var(--gold); border-left-color: var(--gold); background: var(--goldlight); font-weight: 500; }
+.nav-icon { font-size: 14px; opacity: 0.7; }
+
+.nav-section {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--text3);
+  padding: 16px 20px 6px;
+  text-transform: uppercase;
+}
+
+.main { flex: 1; overflow-y: auto; background: var(--bg); }
+
+/* PAGES */
+.page { display: none; padding: 28px; }
+.page.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+/* PAGE HEADER */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-title { font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 400; letter-spacing: 0.15em; color: var(--text); }
+.page-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+/* STATS */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.stat-card { background: var(--bg2); border: 1px solid var(--border); padding: 20px; border-radius: 2px; box-shadow: var(--shadow); }
+.stat-label { font-size: 10px; color: var(--text3); letter-spacing: 0.2em; margin-bottom: 10px; }
+.stat-value { font-family: 'Noto Serif TC', serif; font-size: 26px; color: var(--text); }
+.stat-value.gold { color: var(--gold); }
+.stat-value.green { color: var(--green); }
+.stat-sub { font-size: 10px; color: var(--text3); margin-top: 4px; }
+
+/* BUTTONS */
+.btn { padding: 9px 18px; font-size: 12px; font-family: 'Noto Sans TC', sans-serif; letter-spacing: 0.08em; cursor: pointer; border: none; transition: all 0.15s; border-radius: 2px; }
+.btn-gold { background: var(--gold); color: #fff; font-weight: 500; }
+.btn-gold:hover { background: var(--gold2); }
+.btn-outline { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+.btn-danger { background: transparent; border: 1px solid #e8c0bb; color: #c0392b; font-size: 11px; padding: 4px 10px; border-radius: 2px; }
+.btn-danger:hover { background: #fdf0ee; }
+.btn-sm { padding: 5px 12px; font-size: 11px; }
+
+/* TABLE */
+.table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 2px; overflow-x: auto; box-shadow: var(--shadow); }
+
+.search-bar { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; background: var(--bg3); flex-wrap: wrap; }
+
+.search-input { background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; font-size: 12px; font-family: 'Noto Sans TC', sans-serif; width: 260px; outline: none; border-radius: 2px; }
+.search-input:focus { border-color: var(--gold); }
+.search-input::placeholder { color: var(--text3); }
+
+.filter-select { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 8px 10px; font-size: 11px; font-family: 'Noto Sans TC', sans-serif; outline: none; border-radius: 2px; cursor: pointer; }
+.filter-select:focus { border-color: var(--gold); }
+
+table { width: 100%; border-collapse: collapse; }
+th { font-size: 10px; letter-spacing: 0.15em; color: var(--text3); padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; background: var(--bg3); font-weight: 500; }
+td { padding: 13px 14px; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text2); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #faf8f5; }
+
+.td-main { color: var(--text); font-weight: 500; }
+.td-gold { color: var(--gold); font-family: 'Noto Serif TC', serif; }
+.td-green { color: var(--green); font-family: 'Noto Serif TC', serif; }
+
+.badge { display: inline-block; padding: 3px 9px; font-size: 10px; letter-spacing: 0.08em; border-radius: 2px; }
+.badge-active { background: var(--greenlight); color: var(--green); border: 1px solid #b8dfc8; }
+.badge-done { background: var(--goldlight); color: var(--gold); border: 1px solid #dfd0b8; }
+.badge-pending { background: #eaf2fa; color: var(--blue); border: 1px solid #b8d4ed; }
+
+/* ADVANCED FILTER PANEL */
+.filter-panel {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: none;
+}
+.filter-panel.open { display: block; }
+.filter-panel-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; align-items: end; }
+.filter-group { display: flex; flex-direction: column; gap: 5px; }
+.filter-label { font-size: 10px; color: var(--text3); letter-spacing: 0.15em; }
+.filter-input { background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 7px 10px; font-size: 12px; font-family: 'Noto Sans TC', sans-serif; outline: none; border-radius: 2px; }
+.filter-input:focus { border-color: var(--gold); }
+
+/* HIGHLIGHT */
+.highlight { background: #fff3cd; border-radius: 2px; padding: 0 2px; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,38,32,0.5); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 3px; width: 700px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.15); }
+.modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--bg3); }
+.modal-title { font-family: 'Noto Serif TC', serif; font-size: 16px; letter-spacing: 0.15em; color: var(--gold); font-weight: 400; }
+.modal-close { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 2px; }
+.modal-close:hover { color: var(--text); background: var(--border); }
+.modal-body { padding: 24px; }
+
+/* FORM */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.form-full { grid-column: 1/-1; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label { font-size: 10px; color: var(--text3); letter-spacing: 0.15em; font-weight: 500; }
+.form-input, .form-select, .form-textarea { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 9px 11px; font-size: 12px; font-family: 'Noto Sans TC', sans-serif; outline: none; transition: border-color 0.15s; border-radius: 2px; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--gold); background: var(--bg2); }
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-section { font-size: 10px; letter-spacing: 0.25em; color: var(--gold); margin: 20px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--goldlight); font-weight: 500; }
+
+/* COST TABLE */
+.cost-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.cost-table th { font-size: 10px; color: var(--text3); padding: 8px 10px; text-align: left; background: var(--bg3); border: 1px solid var(--border); letter-spacing: 0.1em; }
+.cost-table td { padding: 6px 8px; border: 1px solid var(--border); background: var(--bg2); }
+.cost-table td:hover { background: var(--bg3); }
+.cost-table input { background: transparent; border: none; color: var(--text); font-size: 12px; font-family: 'Noto Sans TC', sans-serif; width: 100%; outline: none; padding: 2px 0; }
+.cost-table input:focus { border-bottom: 1px solid var(--gold); }
+.cost-table select { background: transparent; border: none; color: var(--text2); font-size: 11px; font-family: 'Noto Sans TC', sans-serif; width: 100%; outline: none; }
+.cost-total { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg3); border: 1px solid var(--border); margin-top: 12px; border-radius: 2px; }
+.cost-total-label { font-size: 10px; color: var(--text3); letter-spacing: 0.15em; margin-bottom: 4px; }
+.cost-total-value { font-family: 'Noto Serif TC', serif; font-size: 20px; color: var(--gold); }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; background: var(--bg3); }
+
+/* DETAIL */
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.detail-key { font-size: 10px; color: var(--text3); letter-spacing: 0.15em; margin-bottom: 4px; }
+.detail-val { font-size: 13px; color: var(--text); }
+
+/* SEARCH PAGE */
+.search-result-count { font-size: 11px; color: var(--text3); padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--bg3); }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg3); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .form-grid { grid-template-columns: 1fr; }
+  .filter-panel-grid { grid-template-columns: 1fr 1fr; }
+  .global-search-wrap { max-width: 200px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">臻善集團 <span>管理系統 v2.0</span></div>
+
+  <!-- GLOBAL SEARCH -->
+  <div class="global-search-wrap">
+    <span class="global-search-icon">🔍</span>
+    <input class="global-search-input" type="text" id="global-search"
+      placeholder="快速搜尋案件、客戶、介紹人…"
+      oninput="globalSearch(this.value)"
+      onblur="setTimeout(()=>closeGlobalResults(),200)"
+      onkeydown="handleGlobalKey(event)">
+    <div class="global-results" id="global-results"></div>
+  </div>
+
+  <button class="btn btn-gold" onclick="openModal('addModal')" style="flex-shrink:0">＋ 新增案件</button>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="nav-section">主要功能</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">▦</span> 總覽儀表板</div>
+    <div class="nav-item" onclick="showPage('cases',this)"><span class="nav-icon">◈</span> 案件管理</div>
+    <div class="nav-item" onclick="showPage('clients',this)"><span class="nav-icon">◉</span> 客戶資料</div>
+    <div class="nav-section">搜尋 &amp; 分析</div>
+    <div class="nav-item" onclick="showPage('search',this)"><span class="nav-icon">◎</span> 進階搜尋</div>
+    <div class="nav-item" onclick="showPage('referral',this)"><span class="nav-icon">◈</span> 介紹人追蹤</div>
+    <div class="nav-item" onclick="showPage('finance',this)"><span class="nav-icon">◆</span> 財務報表</div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><div class="page-title">總覽儀表板</div><div class="page-sub">本月業務概況</div></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">本月案件數</div><div class="stat-value gold" id="stat-count">0</div><div class="stat-sub">件</div></div>
+        <div class="stat-card"><div class="stat-label">本月總收入</div><div class="stat-value gold" id="stat-revenue">$0</div></div>
+        <div class="stat-card"><div class="stat-label">本月淨利</div><div class="stat-value green" id="stat-profit">$0</div></div>
+        <div class="stat-card"><div class="stat-label">平均每件淨利</div><div class="stat-value" id="stat-avg">$0</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="search-bar"><span style="font-size:11px;color:var(--text3);letter-spacing:0.15em;font-weight:500">最近案件</span></div>
+        <table><thead><tr><th>案件編號</th><th>往生者</th><th>家屬</th><th>介紹人</th><th>日期</th><th>總金額</th><th>淨利</th><th>狀態</th></tr></thead>
+        <tbody id="dashboard-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- CASES -->
+    <div class="page" id="page-cases">
+      <div class="page-header">
+        <div><div class="page-title">案件管理</div><div class="page-sub">所有案件記錄</div></div>
+        <button class="btn btn-gold" onclick="openModal('addModal')">＋ 新增案件</button>
+      </div>
+      <div class="table-wrap">
+        <div class="search-bar">
+          <input class="search-input" type="text" placeholder="🔍 搜尋往生者、家屬、介紹人…" id="case-search" oninput="renderCases()">
+          <select class="filter-select" id="case-filter" onchange="renderCases()">
+            <option value="">全部狀態</option>
+            <option>進行中</option><option>已完成</option><option>待確認</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="toggleAdvFilter()" id="adv-btn">＋ 進階篩選</button>
+        </div>
+        <!-- ADVANCED FILTER -->
+        <div class="filter-panel" id="adv-filter">
+          <div class="filter-panel-grid">
+            <div class="filter-group">
+              <label class="filter-label">日期（起）</label>
+              <input class="filter-input" type="date" id="f-date-from" oninput="renderCases()">
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">日期（迄）</label>
+              <input class="filter-input" type="date" id="f-date-to" oninput="renderCases()">
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">宗教信仰</label>
+              <select class="filter-input" id="f-rel" onchange="renderCases()">
+                <option value="">全部</option>
+                <option>道教</option><option>佛教</option><option>基督教</option><option>無（簡約）</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">介紹人</label>
+              <input class="filter-input" type="text" id="f-ref" placeholder="輸入介紹人姓名" oninput="renderCases()">
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">最低金額（元）</label>
+              <input class="filter-input" type="number" id="f-min" placeholder="0" oninput="renderCases()">
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">最高金額（元）</label>
+              <input class="filter-input" type="number" id="f-max" placeholder="不限" oninput="renderCases()">
+            </div>
+            <div class="filter-group" style="align-self:end">
+              <button class="btn btn-outline btn-sm" onclick="clearFilters()">清除所有篩選</button>
+            </div>
+          </div>
+        </div>
+        <div class="search-result-count" id="case-count-label">共 0 筆案件</div>
+        <table>
+          <thead><tr>
+            <th>案件編號</th><th>往生者</th><th>家屬</th><th>電話</th>
+            <th>介紹人</th><th>日期</th><th>總金額</th><th>成本</th><th>淨利</th><th>狀態</th><th>操作</th>
+          </tr></thead>
+          <tbody id="cases-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="page" id="page-clients">
+      <div class="page-header">
+        <div><div class="page-title">客戶資料</div><div class="page-sub">家屬聯絡人資料庫</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="search-bar">
+          <input class="search-input" type="text" placeholder="🔍 搜尋姓名、電話…" id="client-search" oninput="renderClients()">
+        </div>
+        <div class="search-result-count" id="client-count-label">共 0 筆</div>
+        <table>
+          <thead><tr><th>家屬姓名</th><th>電話</th><th>關係</th><th>往生者</th><th>消費金額</th><th>介紹人</th><th>日期</th><th>備註</th></tr></thead>
+          <tbody id="clients-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ★ ADVANCED SEARCH PAGE -->
+    <div class="page" id="page-search">
+      <div class="page-header">
+        <div><div class="page-title">進階搜尋</div><div class="page-sub">輸入任何關鍵字，同時搜尋案件、客戶、介紹人</div></div>
+      </div>
+
+      <!-- Search Box -->
+      <div style="display:flex;gap:10px;margin-bottom:20px;align-items:center;">
+        <div style="position:relative;flex:1;max-width:500px;">
+          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:16px">🔍</span>
+          <input style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:12px 14px 12px 38px;font-size:14px;font-family:'Noto Sans TC',sans-serif;outline:none;border-radius:2px;"
+            type="text" id="adv-search-input" placeholder="輸入往生者姓名、家屬、電話、介紹人…"
+            oninput="runAdvSearch()" onkeydown="if(event.key==='Enter')runAdvSearch()">
+        </div>
+        <button class="btn btn-gold" onclick="runAdvSearch()">搜尋</button>
+        <button class="btn btn-outline" onclick="document.getElementById('adv-search-input').value='';runAdvSearch()">清除</button>
+      </div>
+
+      <!-- Filter chips -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:10px;color:var(--text3);letter-spacing:0.15em;">快速篩選：</span>
+        <button class="btn btn-outline btn-sm adv-chip active-chip" onclick="setChip(this,'')">全部</button>
+        <button class="btn btn-outline btn-sm adv-chip" onclick="setChip(this,'進行中')">進行中</button>
+        <button class="btn btn-outline btn-sm adv-chip" onclick="setChip(this,'已完成')">已完成</button>
+        <button class="btn btn-outline btn-sm adv-chip" onclick="setChip(this,'待確認')">待確認</button>
+        <span style="font-size:10px;color:var(--text3);margin-left:8px;letter-spacing:0.15em;">日期：</span>
+        <input type="date" id="adv-from" class="filter-input" style="padding:5px 8px;font-size:11px;" oninput="runAdvSearch()">
+        <span style="font-size:11px;color:var(--text3)">—</span>
+        <input type="date" id="adv-to" class="filter-input" style="padding:5px 8px;font-size:11px;" oninput="runAdvSearch()">
+      </div>
+
+      <div id="adv-search-results">
+        <div style="text-align:center;padding:60px 20px;color:var(--text3);">
+          <div style="font-size:32px;margin-bottom:12px">🔍</div>
+          <div style="font-size:13px;letter-spacing:0.1em">輸入關鍵字開始搜尋</div>
+          <div style="font-size:11px;margin-top:6px">可搜尋往生者姓名、家屬姓名、電話、介紹人、備註</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REFERRAL -->
+    <div class="page" id="page-referral">
+      <div class="page-header">
+        <div><div class="page-title">介紹人追蹤</div><div class="page-sub">快速找出誰介紹了哪個客戶</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="search-bar">
+          <input class="search-input" type="text" placeholder="🔍 搜尋介紹人姓名…" id="ref-search" oninput="renderReferral()">
+        </div>
+        <table>
+          <thead><tr><th>介紹人</th><th>案件數</th><th>帶來總收入</th><th>最近日期</th><th>相關案件</th></tr></thead>
+          <tbody id="referral-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FINANCE -->
+    <div class="page" id="page-finance">
+      <div class="page-header">
+        <div><div class="page-title">財務報表</div><div class="page-sub">收支總覽</div></div>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card"><div class="stat-label">全部總收入</div><div class="stat-value gold" id="fin-revenue">$0</div></div>
+        <div class="stat-card"><div class="stat-label">全部總成本</div><div class="stat-value" id="fin-cost">$0</div></div>
+        <div class="stat-card"><div class="stat-label">全部總淨利</div><div class="stat-value green" id="fin-profit">$0</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="search-bar"><span style="font-size:11px;color:var(--text3);letter-spacing:0.15em;font-weight:500">各案件收支明細</span></div>
+        <table>
+          <thead><tr><th>案件編號</th><th>往生者</th><th>日期</th><th>標配</th><th>選配</th><th>總收入</th><th>總成本</th><th>淨利</th><th>利潤率</th></tr></thead>
+          <tbody id="finance-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title-text">新增案件</div>
+      <button class="modal-close" onclick="closeModal('addModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-section">往生者資料</div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">往生者姓名 *</label><input class="form-input" type="text" id="f-deceased" placeholder="例：王大明"></div>
+        <div class="form-group"><label class="form-label">往生日期 *</label><input class="form-input" type="date" id="f-date"></div>
+        <div class="form-group"><label class="form-label">性別</label><select class="form-select" id="f-gender"><option>男</option><option>女</option></select></div>
+        <div class="form-group"><label class="form-label">享年</label><input class="form-input" type="number" id="f-age" placeholder="歲"></div>
+        <div class="form-group"><label class="form-label">宗教信仰</label><select class="form-select" id="f-religion"><option>道教</option><option>佛教</option><option>基督教</option><option>無（簡約）</option></select></div>
+        <div class="form-group"><label class="form-label">案件狀態</label><select class="form-select" id="f-status"><option>進行中</option><option>待確認</option><option>已完成</option></select></div>
+      </div>
+      <div class="form-section">家屬聯絡人</div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">家屬姓名 *</label><input class="form-input" type="text" id="f-contact" placeholder="例：王小明"></div>
+        <div class="form-group"><label class="form-label">與往生者關係</label><input class="form-input" type="text" id="f-relation" placeholder="例：長子"></div>
+        <div class="form-group"><label class="form-label">聯絡電話 *</label><input class="form-input" type="tel" id="f-phone" placeholder="09xx-xxx-xxx"></div>
+        <div class="form-group"><label class="form-label">介紹人</label><input class="form-input" type="text" id="f-referral" placeholder="介紹人姓名（無則留空）"></div>
+      </div>
+      <div class="form-section">費用明細</div>
+      <table class="cost-table">
+        <thead><tr><th style="width:38%">項目名稱</th><th style="width:18%">類型</th><th style="width:22%">收費（元）</th><th style="width:22%">成本（元）</th></tr></thead>
+        <tbody id="cost-rows"></tbody>
+      </table>
+      <div style="margin-top:10px;"><button class="btn btn-outline btn-sm" onclick="addCostRow()">＋ 新增項目</button></div>
+      <div class="cost-total">
+        <div style="text-align:center"><div class="cost-total-label">總收費</div><div class="cost-total-value" id="total-price">$0</div></div>
+        <div style="text-align:center"><div class="cost-total-label">總成本</div><div style="font-family:'Noto Serif TC',serif;font-size:18px;color:var(--text2)" id="total-cost">$0</div></div>
+        <div style="text-align:center"><div class="cost-total-label">預估淨利</div><div style="font-family:'Noto Serif TC',serif;font-size:22px;color:var(--green)" id="total-profit">$0</div></div>
+      </div>
+      <div class="form-section">備註</div>
+      <div class="form-group"><textarea class="form-textarea" id="f-note" placeholder="家屬特殊需求…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addModal')">取消</button>
+      <button class="btn btn-gold" onclick="saveCase()">儲存案件</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="detail-title">案件詳情</div>
+      <button class="modal-close" onclick="closeModal('detailModal')">✕</button>
+    </div>
+    <div class="modal-body" id="detail-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('detailModal')">關閉</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.adv-chip { border-radius: 20px !important; padding: 4px 14px !important; font-size: 11px !important; }
+.active-chip { background: var(--goldlight) !important; border-color: var(--gold) !important; color: var(--gold) !important; font-weight: 500 !important; }
+</style>
+
+<script>
+let cases = JSON.parse(localStorage.getItem('funeral-cases-v2') || '[]');
+let editingId = null;
+let costRowCount = 0;
+let advChipFilter = '';
+
+function save() { localStorage.setItem('funeral-cases-v2', JSON.stringify(cases)); }
+
+// DEMO DATA
+if (cases.length === 0) {
+  cases = [
+    { id:'TZ-2025001', deceased:'陳志明', date:'2025-04-05', gender:'男', age:78, religion:'道教', status:'已完成', contact:'陳建宏', relation:'長子', phone:'0912-345-678', referral:'林太太介紹', note:'家屬希望簡單莊重',
+      items:[{name:'接體運送',type:'標配',price:8000,cost:0},{name:'遺體冰存',type:'標配',price:5000,cost:0},{name:'棺木（上等柚木）',type:'標配',price:25000,cost:12000},{name:'禮廳租借（3天）',type:'標配',price:30000,cost:18000},{name:'告別式流程',type:'標配',price:15000,cost:5000},{name:'火化費用',type:'標配',price:8000,cost:6000},{name:'頭七法會',type:'選配',price:12000,cost:5000},{name:'花藝佈置升級',type:'選配',price:12000,cost:6000}]},
+    { id:'TZ-2025002', deceased:'王美麗', date:'2025-04-12', gender:'女', age:65, religion:'佛教', status:'已完成', contact:'王志偉', relation:'長子', phone:'0923-456-789', referral:'黃先生介紹', note:'',
+      items:[{name:'接體運送',type:'標配',price:8000,cost:0},{name:'遺體冰存',type:'標配',price:5000,cost:0},{name:'棺木（標準）',type:'標配',price:15000,cost:8000},{name:'禮廳租借（2天）',type:'標配',price:20000,cost:15000},{name:'告別式流程',type:'標配',price:15000,cost:5000},{name:'火化費用',type:'標配',price:8000,cost:6000},{name:'骨灰罈（高級）',type:'選配',price:8000,cost:3000}]},
+    { id:'TZ-2025003', deceased:'李文雄', date:'2025-04-20', gender:'男', age:83, religion:'無（簡約）', status:'進行中', contact:'李雅婷', relation:'長女', phone:'0934-567-890', referral:'林太太介紹', note:'家屬人數眾多，需要較大禮廳',
+      items:[{name:'接體運送',type:'標配',price:8000,cost:0},{name:'遺體冰存',type:'標配',price:5000,cost:0},{name:'棺木（上等）',type:'標配',price:28000,cost:14000},{name:'大禮廳租借（4天）',type:'標配',price:45000,cost:28000},{name:'告別式流程',type:'標配',price:15000,cost:5000},{name:'火化費用',type:'標配',price:8000,cost:6000},{name:'三七法會',type:'選配',price:25000,cost:10000},{name:'直播服務',type:'選配',price:5000,cost:1000},{name:'家屬紀念冊',type:'選配',price:3000,cost:800}]},
+    { id:'TZ-2025004', deceased:'張秀蘭', date:'2025-04-28', gender:'女', age:91, religion:'佛教', status:'待確認', contact:'張明哲', relation:'次子', phone:'0945-678-901', referral:'', note:'自行來電詢問',
+      items:[{name:'接體運送',type:'標配',price:8000,cost:0},{name:'遺體冰存',type:'標配',price:5000,cost:0},{name:'棺木（標準）',type:'標配',price:15000,cost:8000},{name:'禮廳租借',type:'標配',price:20000,cost:15000},{name:'告別式流程',type:'標配',price:15000,cost:5000},{name:'火化費用',type:'標配',price:8000,cost:6000}]},
+  ];
+  save();
+}
+
+function fmt(n) { return '$' + Number(n).toLocaleString(); }
+function getTotal(items) { const p=items.reduce((a,i)=>a+Number(i.price),0); const c=items.reduce((a,i)=>a+Number(i.cost),0); return {price:p,cost:c,profit:p-c}; }
+function statusBadge(s) {
+  if(s==='進行中') return `<span class="badge badge-active">${s}</span>`;
+  if(s==='已完成') return `<span class="badge badge-done">${s}</span>`;
+  return `<span class="badge badge-pending">${s}</span>`;
+}
+
+function hl(text, q) {
+  if (!q) return text;
+  const re = new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')', 'gi');
+  return String(text).replace(re, '<span class="highlight">$1</span>');
+}
+
+// ── NAVIGATION ──
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  renderAll();
+}
+
+function renderAll() { renderDashboard(); renderCases(); renderClients(); renderReferral(); renderFinance(); }
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  const now = new Date();
+  const tm = cases.filter(c=>{ const d=new Date(c.date); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+  const rev = tm.map(c=>getTotal(c.items).price).reduce((a,v)=>a+v,0);
+  const prof = tm.map(c=>getTotal(c.items).profit).reduce((a,v)=>a+v,0);
+  document.getElementById('stat-count').textContent = tm.length;
+  document.getElementById('stat-revenue').textContent = fmt(rev);
+  document.getElementById('stat-profit').textContent = fmt(prof);
+  document.getElementById('stat-avg').textContent = tm.length ? fmt(Math.round(prof/tm.length)) : '$0';
+  const recent = [...cases].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
+  document.getElementById('dashboard-table').innerHTML = recent.map(c=>{
+    const t=getTotal(c.items);
+    return `<tr onclick="showDetail('${c.id}')" style="cursor:pointer">
+      <td class="td-main">${c.id}</td><td class="td-main">${c.deceased}</td><td>${c.contact}</td>
+      <td>${c.referral||'<span style="color:var(--text3)">—</span>'}</td><td>${c.date}</td>
+      <td class="td-gold">${fmt(t.price)}</td><td class="td-green">${fmt(t.profit)}</td><td>${statusBadge(c.status)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── CASES ──
+function renderCases() {
+  const q = (document.getElementById('case-search')?.value||'').toLowerCase();
+  const statusF = document.getElementById('case-filter')?.value||'';
+  const dateFrom = document.getElementById('f-date-from')?.value||'';
+  const dateTo = document.getElementById('f-date-to')?.value||'';
+  const relF = document.getElementById('f-rel')?.value||'';
+  const refF = (document.getElementById('f-ref')?.value||'').toLowerCase();
+  const minF = Number(document.getElementById('f-min')?.value||0);
+  const maxF = Number(document.getElementById('f-max')?.value||0);
+
+  const filtered = cases.filter(c=>{
+    const t = getTotal(c.items);
+    if(q && !c.deceased.toLowerCase().includes(q) && !c.contact.toLowerCase().includes(q) && !(c.referral||'').toLowerCase().includes(q) && !c.phone.includes(q)) return false;
+    if(statusF && c.status!==statusF) return false;
+    if(dateFrom && c.date<dateFrom) return false;
+    if(dateTo && c.date>dateTo) return false;
+    if(relF && c.religion!==relF) return false;
+    if(refF && !(c.referral||'').toLowerCase().includes(refF)) return false;
+    if(minF && t.price<minF) return false;
+    if(maxF && t.price>maxF) return false;
+    return true;
+  });
+
+  document.getElementById('case-count-label').textContent = `共 ${filtered.length} 筆案件`;
+  document.getElementById('cases-table').innerHTML = filtered.map(c=>{
+    const t=getTotal(c.items);
+    return `<tr>
+      <td class="td-main" style="cursor:pointer" onclick="showDetail('${c.id}')">${hl(c.id,q)}</td>
+      <td class="td-main">${hl(c.deceased,q)}</td><td>${hl(c.contact,q)}</td><td>${c.phone}</td>
+      <td>${c.referral ? hl(c.referral,q) : '<span style="color:var(--text3)">—</span>'}</td>
+      <td>${c.date}</td><td class="td-gold">${fmt(t.price)}</td>
+      <td style="color:var(--text3)">${fmt(t.cost)}</td><td class="td-green">${fmt(t.profit)}</td>
+      <td>${statusBadge(c.status)}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="editCase('${c.id}')" style="margin-right:4px">編輯</button>
+        <button class="btn btn-danger" onclick="deleteCase('${c.id}')">刪除</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleAdvFilter() {
+  const panel = document.getElementById('adv-filter');
+  const btn = document.getElementById('adv-btn');
+  panel.classList.toggle('open');
+  btn.textContent = panel.classList.contains('open') ? '▲ 收起篩選' : '＋ 進階篩選';
+}
+
+function clearFilters() {
+  ['f-date-from','f-date-to','f-rel','f-ref','f-min','f-max','case-search'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('case-filter').value='';
+  renderCases();
+}
+
+// ── CLIENTS ──
+function renderClients() {
+  const q = (document.getElementById('client-search')?.value||'').toLowerCase();
+  const filtered = cases.filter(c=>!q||c.contact.toLowerCase().includes(q)||c.phone.includes(q));
+  document.getElementById('client-count-label').textContent = `共 ${filtered.length} 筆`;
+  document.getElementById('clients-table').innerHTML = filtered.map(c=>{
+    const t=getTotal(c.items);
+    return `<tr><td class="td-main">${hl(c.contact,q)}</td><td>${hl(c.phone,q)}</td><td>${c.relation}</td>
+      <td>${c.deceased}</td><td class="td-gold">${fmt(t.price)}</td>
+      <td>${c.referral||'<span style="color:var(--text3)">—</span>'}</td><td>${c.date}</td>
+      <td style="color:var(--text3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.note||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── REFERRAL ──
+function renderReferral() {
+  const q = (document.getElementById('ref-search')?.value||'').toLowerCase();
+  const map = {};
+  cases.forEach(c=>{ const r=c.referral||'自行來電'; if(!map[r]) map[r]={count:0,revenue:0,dates:[],ids:[]}; const t=getTotal(c.items); map[r].count++; map[r].revenue+=t.price; map[r].dates.push(c.date); map[r].ids.push(c.id); });
+  const sorted = Object.entries(map).filter(([k])=>!q||k.toLowerCase().includes(q)).sort((a,b)=>b[1].count-a[1].count);
+  document.getElementById('referral-table').innerHTML = sorted.map(([name,d])=>`<tr>
+    <td class="td-main">${hl(name,q)}</td>
+    <td style="font-family:'Noto Serif TC',serif;font-size:18px;color:var(--gold)">${d.count} 件</td>
+    <td class="td-gold">${fmt(d.revenue)}</td>
+    <td>${d.dates.sort().reverse()[0]}</td>
+    <td style="color:var(--text3);font-size:11px">${d.ids.map(id=>`<span onclick="showDetail('${id}')" style="cursor:pointer;text-decoration:underline;margin-right:4px">${id}</span>`).join('')}</td>
+  </tr>`).join('');
+}
+
+// ── FINANCE ──
+function renderFinance() {
+  let totalRev=0,totalCost=0,totalProfit=0;
+  document.getElementById('finance-table').innerHTML = cases.map(c=>{
+    const std=c.items.filter(i=>i.type==='標配').reduce((a,i)=>a+i.price,0);
+    const opt=c.items.filter(i=>i.type==='選配').reduce((a,i)=>a+i.price,0);
+    const t=getTotal(c.items); const m=t.price>0?Math.round(t.profit/t.price*100):0;
+    totalRev+=t.price; totalCost+=t.cost; totalProfit+=t.profit;
+    return `<tr><td class="td-main">${c.id}</td><td>${c.deceased}</td><td>${c.date}</td>
+      <td>${fmt(std)}</td><td>${fmt(opt)}</td><td class="td-gold">${fmt(t.price)}</td>
+      <td style="color:var(--text3)">${fmt(t.cost)}</td><td class="td-green">${fmt(t.profit)}</td>
+      <td style="color:${m>50?'var(--green)':'var(--text2)'};font-weight:500">${m}%</td></tr>`;
+  }).join('');
+  document.getElementById('fin-revenue').textContent=fmt(totalRev);
+  document.getElementById('fin-cost').textContent=fmt(totalCost);
+  document.getElementById('fin-profit').textContent=fmt(totalProfit);
+}
+
+// ── GLOBAL SEARCH (topbar) ──
+function globalSearch(q) {
+  const res = document.getElementById('global-results');
+  if (!q || q.length < 1) { res.classList.remove('open'); return; }
+  const ql = q.toLowerCase();
+  const matched = cases.filter(c =>
+    c.deceased.toLowerCase().includes(ql) || c.contact.toLowerCase().includes(ql) ||
+    c.phone.includes(ql) || (c.referral||'').toLowerCase().includes(ql) || c.id.toLowerCase().includes(ql)
+  ).slice(0, 8);
+
+  if (matched.length === 0) {
+    res.innerHTML = `<div class="gr-empty">找不到「${q}」相關資料</div>`;
+  } else {
+    res.innerHTML = `<div class="gr-section-title">搜尋結果（${matched.length} 筆）</div>` +
+      matched.map(c => {
+        const t = getTotal(c.items);
+        return `<div class="gr-item" onclick="showDetail('${c.id}');closeGlobalResults();document.getElementById('global-search').value=''">
+          <div>
+            <div class="gr-main">${hl(c.deceased,q)} <span style="color:var(--text3);font-size:11px;font-weight:400">／ ${hl(c.contact,q)}</span></div>
+            <div class="gr-sub">${c.id} · ${c.date} · ${c.referral||'自行來電'}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="gr-badge">${fmt(t.price)}</div>
+            <div style="margin-top:4px">${statusBadge(c.status)}</div>
+          </div>
+        </div>`;
+      }).join('');
+  }
+  res.classList.add('open');
+}
+
+function closeGlobalResults() {
+  document.getElementById('global-results').classList.remove('open');
+}
+
+function handleGlobalKey(e) {
+  if(e.key==='Escape') { closeGlobalResults(); document.getElementById('global-search').value=''; }
+}
+
+// ── ADVANCED SEARCH PAGE ──
+let advChip = '';
+
+function setChip(el, val) {
+  document.querySelectorAll('.adv-chip').forEach(b=>b.classList.remove('active-chip'));
+  el.classList.add('active-chip');
+  advChip = val;
+  runAdvSearch();
+}
+
+function runAdvSearch() {
+  const q = (document.getElementById('adv-search-input')?.value||'').toLowerCase().trim();
+  const from = document.getElementById('adv-from')?.value||'';
+  const to = document.getElementById('adv-to')?.value||'';
+  const container = document.getElementById('adv-search-results');
+
+  if (!q && !advChip && !from && !to) {
+    container.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--text3);"><div style="font-size:32px;margin-bottom:12px">🔍</div><div style="font-size:13px;letter-spacing:0.1em">輸入關鍵字開始搜尋</div><div style="font-size:11px;margin-top:6px">可搜尋往生者姓名、家屬姓名、電話、介紹人、備註</div></div>`;
+    return;
+  }
+
+  const filtered = cases.filter(c => {
+    if(advChip && c.status!==advChip) return false;
+    if(from && c.date<from) return false;
+    if(to && c.date>to) return false;
+    if(!q) return true;
+    return c.deceased.toLowerCase().includes(q) || c.contact.toLowerCase().includes(q) ||
+      c.phone.includes(q) || (c.referral||'').toLowerCase().includes(q) ||
+      (c.note||'').toLowerCase().includes(q) || c.id.toLowerCase().includes(q) ||
+      c.relation.toLowerCase().includes(q);
+  });
+
+  if(filtered.length===0){
+    container.innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--text3);"><div style="font-size:32px;margin-bottom:12px">😔</div><div style="font-size:13px">找不到符合的案件</div></div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div style="font-size:11px;color:var(--text3);margin-bottom:12px;letter-spacing:0.1em">找到 <strong style="color:var(--gold)">${filtered.length}</strong> 筆符合的案件</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>案件編號</th><th>往生者</th><th>家屬</th><th>電話</th><th>介紹人</th><th>日期</th><th>總金額</th><th>淨利</th><th>狀態</th></tr></thead>
+        <tbody>
+          ${filtered.map(c=>{
+            const t=getTotal(c.items);
+            return `<tr onclick="showDetail('${c.id}')" style="cursor:pointer">
+              <td class="td-main">${hl(c.id,q)}</td>
+              <td class="td-main">${hl(c.deceased,q)}</td>
+              <td>${hl(c.contact,q)}</td>
+              <td>${hl(c.phone,q)}</td>
+              <td>${c.referral ? hl(c.referral,q) : '<span style="color:var(--text3)">—</span>'}</td>
+              <td>${c.date}</td>
+              <td class="td-gold">${fmt(t.price)}</td>
+              <td class="td-green">${fmt(t.profit)}</td>
+              <td>${statusBadge(c.status)}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── MODAL ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); if(id==='addModal'){editingId=null;resetForm();} }
+
+const defaultItems = [
+  {name:'接體運送',type:'標配',price:8000,cost:0},{name:'遺體冰存',type:'標配',price:5000,cost:0},
+  {name:'棺木',type:'標配',price:15000,cost:8000},{name:'禮廳租借',type:'標配',price:20000,cost:15000},
+  {name:'告別式流程',type:'標配',price:15000,cost:5000},{name:'火化費用',type:'標配',price:8000,cost:6000},
+  {name:'骨灰罈',type:'選配',price:5000,cost:2000},{name:'花藝佈置',type:'選配',price:8000,cost:4000},
+];
+
+function resetForm() {
+  ['f-deceased','f-date','f-contact','f-relation','f-phone','f-referral','f-note'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('f-gender').value='男';
+  document.getElementById('f-religion').value='道教';
+  document.getElementById('f-status').value='進行中';
+  document.getElementById('f-age').value='';
+  document.getElementById('modal-title-text').textContent='新增案件';
+  loadCostRows(defaultItems);
+}
+
+function loadCostRows(items) {
+  costRowCount=0; document.getElementById('cost-rows').innerHTML='';
+  items.forEach(item=>addCostRow(item)); calcTotal();
+}
+
+function addCostRow(item={}) {
+  const n=costRowCount++;
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td><input type="text" id="ci-name-${n}" value="${item.name||''}" placeholder="項目名稱"></td>
+    <td><select id="ci-type-${n}"><option${item.type==='標配'?' selected':''}>標配</option><option${item.type==='選配'?' selected':''}>選配</option><option${item.type==='成本'?' selected':''}>成本</option></select></td>
+    <td><input type="number" id="ci-price-${n}" value="${item.price||0}" oninput="calcTotal()"></td>
+    <td><input type="number" id="ci-cost-${n}" value="${item.cost||0}" oninput="calcTotal()"></td>`;
+  document.getElementById('cost-rows').appendChild(tr);
+  calcTotal();
+}
+
+function calcTotal() {
+  let p=0,c=0;
+  for(let i=0;i<costRowCount;i++){ p+=Number(document.getElementById(`ci-price-${i}`)?.value||0); c+=Number(document.getElementById(`ci-cost-${i}`)?.value||0); }
+  document.getElementById('total-price').textContent=fmt(p);
+  document.getElementById('total-cost').textContent=fmt(c);
+  document.getElementById('total-profit').textContent=fmt(p-c);
+}
+
+function saveCase() {
+  const deceased=document.getElementById('f-deceased').value.trim();
+  const contact=document.getElementById('f-contact').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const date=document.getElementById('f-date').value;
+  if(!deceased||!contact||!phone||!date){alert('請填寫必填欄位（往生者姓名、家屬、電話、日期）');return;}
+  const items=[];
+  for(let i=0;i<costRowCount;i++){ const name=document.getElementById(`ci-name-${i}`)?.value?.trim(); if(!name) continue; items.push({name,type:document.getElementById(`ci-type-${i}`).value,price:Number(document.getElementById(`ci-price-${i}`).value||0),cost:Number(document.getElementById(`ci-cost-${i}`).value||0)}); }
+  const data={deceased,date,contact,phone,items,gender:document.getElementById('f-gender').value,age:document.getElementById('f-age').value,religion:document.getElementById('f-religion').value,status:document.getElementById('f-status').value,relation:document.getElementById('f-relation').value,referral:document.getElementById('f-referral').value.trim(),note:document.getElementById('f-note').value.trim()};
+  if(editingId){ const idx=cases.findIndex(c=>c.id===editingId); cases[idx]={...cases[idx],...data}; }
+  else { data.id='TZ-'+new Date().getFullYear()+String(cases.length+1).padStart(3,'0'); cases.unshift(data); }
+  save(); closeModal('addModal'); renderAll();
+}
+
+function editCase(id) {
+  const c=cases.find(x=>x.id===id); if(!c) return; editingId=id;
+  document.getElementById('modal-title-text').textContent='編輯案件 — '+c.id;
+  document.getElementById('f-deceased').value=c.deceased; document.getElementById('f-date').value=c.date;
+  document.getElementById('f-gender').value=c.gender; document.getElementById('f-age').value=c.age;
+  document.getElementById('f-religion').value=c.religion; document.getElementById('f-status').value=c.status;
+  document.getElementById('f-contact').value=c.contact; document.getElementById('f-relation').value=c.relation;
+  document.getElementById('f-phone').value=c.phone; document.getElementById('f-referral').value=c.referral||'';
+  document.getElementById('f-note').value=c.note||'';
+  loadCostRows(c.items); openModal('addModal');
+}
+
+function deleteCase(id) {
+  if(!confirm('確定要刪除此案件？')) return;
+  cases=cases.filter(c=>c.id!==id); save(); renderAll();
+}
+
+function showDetail(id) {
+  const c=cases.find(x=>x.id===id); if(!c) return;
+  const t=getTotal(c.items);
+  document.getElementById('detail-title').textContent=c.id+'｜'+c.deceased;
+  document.getElementById('detail-body').innerHTML=`
+    <div class="form-section">往生者資料</div>
+    <div class="detail-grid">
+      <div><div class="detail-key">往生者</div><div class="detail-val">${c.deceased}（${c.gender}，${c.age}歲）</div></div>
+      <div><div class="detail-key">往生日期</div><div class="detail-val">${c.date}</div></div>
+      <div><div class="detail-key">宗教信仰</div><div class="detail-val">${c.religion}</div></div>
+      <div><div class="detail-key">狀態</div><div class="detail-val">${statusBadge(c.status)}</div></div>
+    </div>
+    <div class="form-section">家屬聯絡人</div>
+    <div class="detail-grid">
+      <div><div class="detail-key">家屬姓名</div><div class="detail-val">${c.contact}（${c.relation}）</div></div>
+      <div><div class="detail-key">聯絡電話</div><div class="detail-val">${c.phone}</div></div>
+      <div><div class="detail-key">介紹人</div><div class="detail-val">${c.referral||'自行來電'}</div></div>
+      <div><div class="detail-key">備註</div><div class="detail-val">${c.note||'—'}</div></div>
+    </div>
+    <div class="form-section">費用明細</div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:12px;">
+      <thead><tr>
+        <th style="text-align:left;font-size:10px;color:var(--text3);padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg3)">項目</th>
+        <th style="text-align:left;font-size:10px;color:var(--text3);padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg3)">類型</th>
+        <th style="text-align:right;font-size:10px;color:var(--text3);padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg3)">收費</th>
+        <th style="text-align:right;font-size:10px;color:var(--text3);padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg3)">成本</th>
+      </tr></thead>
+      <tbody>${c.items.map(i=>`<tr>
+        <td style="padding:10px;color:var(--text2);border-bottom:1px solid var(--border);font-size:12px">${i.name}</td>
+        <td style="padding:10px;border-bottom:1px solid var(--border)"><span class="badge ${i.type==='標配'?'badge-done':'badge-active'}">${i.type}</span></td>
+        <td style="padding:10px;text-align:right;color:var(--gold);border-bottom:1px solid var(--border);font-family:'Noto Serif TC',serif">${fmt(i.price)}</td>
+        <td style="padding:10px;text-align:right;color:var(--text3);border-bottom:1px solid var(--border)">${fmt(i.cost)}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <div style="display:flex;justify-content:space-around;padding:16px;background:var(--bg3);border:1px solid var(--border);border-radius:2px">
+      <div style="text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">總收費</div><div style="font-family:'Noto Serif TC',serif;font-size:22px;color:var(--gold)">${fmt(t.price)}</div></div>
+      <div style="text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">總成本</div><div style="font-family:'Noto Serif TC',serif;font-size:22px;color:var(--text2)">${fmt(t.cost)}</div></div>
+      <div style="text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">淨利</div><div style="font-family:'Noto Serif TC',serif;font-size:22px;color:var(--green)">${fmt(t.profit)}</div></div>
+      <div style="text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">利潤率</div><div style="font-family:'Noto Serif TC',serif;font-size:22px;color:var(--text)">${Math.round(t.profit/t.price*100)}%</div></div>
+    </div>
+    <div style="margin-top:16px;text-align:right">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('detailModal');editCase('${c.id}')">✏️ 編輯此案件</button>
+    </div>`;
+  openModal('detailModal');
+}
+
+// INIT
+loadCostRows(defaultItems);
+renderAll();
+</script>
+</body>
+</html>
