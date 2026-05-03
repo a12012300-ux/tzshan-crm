@@ -306,7 +306,7 @@ tr:hover td { background: #faf8f5; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 
-/* 防止表格名字折行 */
+/* 防止表格名字折行（桌機） */
 td { white-space: nowrap; }
 td.wrap { white-space: normal; }
 
@@ -315,19 +315,62 @@ td.wrap { white-space: normal; }
   .stats-grid { grid-template-columns: repeat(2,1fr); }
   .form-grid { grid-template-columns: 1fr; }
   .filter-panel-grid { grid-template-columns: 1fr 1fr; }
-  .global-search-wrap { max-width: 200px; }
+  .global-search-wrap { max-width: 180px; }
 
-  /* 手機版字體縮回適合大小 */
+  /* 手機版字體 */
   body { font-size: 14px; }
-  td { font-size: 14px; padding: 12px 10px; white-space: nowrap; }
-  th { font-size: 12px; padding: 10px 10px; }
   .stat-value { font-size: 24px; }
   .stat-label { font-size: 11px; }
   .btn { font-size: 13px; padding: 9px 14px; }
   .page-title { font-size: 20px; }
-  .nav-item { font-size: 14px; }
-  .logo { font-size: 16px; }
+  .logo { font-size: 15px; }
   .global-search-input { font-size: 14px; }
+
+  /* 手機版：隱藏表格，改用卡片 */
+  .mobile-hide { display: none !important; }
+  table thead { display: none; }
+  table, tbody, tr, td { display: block; width: 100%; }
+
+  tr {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    padding: 14px;
+    white-space: normal !important;
+  }
+  tr:hover { background: var(--goldlight); }
+
+  td {
+    white-space: normal !important;
+    padding: 3px 0;
+    border: none;
+    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    min-width: 60px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  td:empty { display: none; }
+  td[data-label=""] { display: none; }
+
+  /* 操作按鈕在手機上排成一排 */
+  td[data-label="操作"] {
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border) !important;
+  }
 }
 </style>
 </head>
@@ -668,9 +711,14 @@ function renderDashboard() {
   document.getElementById('dashboard-table').innerHTML = recent.map(c=>{
     const t=getTotal(c.items);
     return `<tr onclick="showDetail('${c.id}')" style="cursor:pointer">
-      <td class="td-main">${c.id}</td><td class="td-main">${c.deceased}</td><td>${c.contact}</td>
-      <td>${c.referral||'<span style="color:var(--text3)">—</span>'}</td><td>${c.date}</td>
-      <td class="td-gold">${fmt(t.price)}</td><td class="td-green">${fmt(t.profit)}</td><td>${statusBadge(c.status)}</td>
+      <td data-label="案件編號" class="td-main">${c.id}</td>
+      <td data-label="往生者" class="td-main">${c.deceased}</td>
+      <td data-label="家屬">${c.contact}</td>
+      <td data-label="介紹人">${c.referral||'—'}</td>
+      <td data-label="日期">${c.date}</td>
+      <td data-label="總金額" class="td-gold">${fmt(t.price)}</td>
+      <td data-label="淨利" class="td-green">${fmt(t.profit)}</td>
+      <td data-label="狀態">${statusBadge(c.status)}</td>
     </tr>`;
   }).join('');
 }
@@ -703,13 +751,17 @@ function renderCases() {
   document.getElementById('cases-table').innerHTML = filtered.map(c=>{
     const t=getTotal(c.items);
     return `<tr>
-      <td class="td-main" style="cursor:pointer" onclick="showDetail('${c.id}')">${hl(c.id,q)}</td>
-      <td class="td-main">${hl(c.deceased,q)}</td><td>${hl(c.contact,q)}</td><td>${c.phone}</td>
-      <td>${c.referral ? hl(c.referral,q) : '<span style="color:var(--text3)">—</span>'}</td>
-      <td>${c.date}</td><td class="td-gold">${fmt(t.price)}</td>
-      <td style="color:var(--text3)">${fmt(t.cost)}</td><td class="td-green">${fmt(t.profit)}</td>
-      <td>${statusBadge(c.status)}</td>
-      <td>
+      <td data-label="案件編號" class="td-main" style="cursor:pointer" onclick="showDetail('${c.id}')">${hl(c.id,q)}</td>
+      <td data-label="往生者" class="td-main">${hl(c.deceased,q)}</td>
+      <td data-label="家屬">${hl(c.contact,q)}</td>
+      <td data-label="電話">${c.phone}</td>
+      <td data-label="介紹人">${c.referral ? hl(c.referral,q) : '—'}</td>
+      <td data-label="日期">${c.date}</td>
+      <td data-label="總金額" class="td-gold">${fmt(t.price)}</td>
+      <td data-label="成本" style="color:var(--text3)">${fmt(t.cost)}</td>
+      <td data-label="淨利" class="td-green">${fmt(t.profit)}</td>
+      <td data-label="狀態">${statusBadge(c.status)}</td>
+      <td data-label="操作">
         <button class="btn btn-outline btn-sm" onclick="editCase('${c.id}')" style="margin-right:4px">編輯</button>
         <button class="btn btn-danger" onclick="deleteCase('${c.id}')">刪除</button>
       </td>
@@ -737,10 +789,15 @@ function renderClients() {
   document.getElementById('client-count-label').textContent = `共 ${filtered.length} 筆`;
   document.getElementById('clients-table').innerHTML = filtered.map(c=>{
     const t=getTotal(c.items);
-    return `<tr><td class="td-main">${hl(c.contact,q)}</td><td>${hl(c.phone,q)}</td><td>${c.relation}</td>
-      <td>${c.deceased}</td><td class="td-gold">${fmt(t.price)}</td>
-      <td>${c.referral||'<span style="color:var(--text3)">—</span>'}</td><td>${c.date}</td>
-      <td style="color:var(--text3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.note||'—'}</td>
+    return `<tr>
+      <td data-label="家屬姓名" class="td-main">${hl(c.contact,q)}</td>
+      <td data-label="電話">${hl(c.phone,q)}</td>
+      <td data-label="關係">${c.relation}</td>
+      <td data-label="往生者">${c.deceased}</td>
+      <td data-label="消費金額" class="td-gold">${fmt(t.price)}</td>
+      <td data-label="介紹人">${c.referral||'—'}</td>
+      <td data-label="日期">${c.date}</td>
+      <td data-label="備註" style="color:var(--text3)">${c.note||'—'}</td>
     </tr>`;
   }).join('');
 }
@@ -752,11 +809,11 @@ function renderReferral() {
   cases.forEach(c=>{ const r=c.referral||'自行來電'; if(!map[r]) map[r]={count:0,revenue:0,dates:[],ids:[]}; const t=getTotal(c.items); map[r].count++; map[r].revenue+=t.price; map[r].dates.push(c.date); map[r].ids.push(c.id); });
   const sorted = Object.entries(map).filter(([k])=>!q||k.toLowerCase().includes(q)).sort((a,b)=>b[1].count-a[1].count);
   document.getElementById('referral-table').innerHTML = sorted.map(([name,d])=>`<tr>
-    <td class="td-main">${hl(name,q)}</td>
-    <td style="font-family:'Noto Serif TC',serif;font-size:18px;color:var(--gold)">${d.count} 件</td>
-    <td class="td-gold">${fmt(d.revenue)}</td>
-    <td>${d.dates.sort().reverse()[0]}</td>
-    <td style="color:var(--text3);font-size:11px">${d.ids.map(id=>`<span onclick="showDetail('${id}')" style="cursor:pointer;text-decoration:underline;margin-right:4px">${id}</span>`).join('')}</td>
+    <td data-label="介紹人" class="td-main">${hl(name,q)}</td>
+    <td data-label="案件數" style="font-family:'Noto Serif TC',serif;font-size:18px;color:var(--gold)">${d.count} 件</td>
+    <td data-label="總收入" class="td-gold">${fmt(d.revenue)}</td>
+    <td data-label="最近日期">${d.dates.sort().reverse()[0]}</td>
+    <td data-label="相關案件" style="color:var(--text3);font-size:13px">${d.ids.map(id=>`<span onclick="showDetail('${id}')" style="cursor:pointer;text-decoration:underline;margin-right:4px">${id}</span>`).join('')}</td>
   </tr>`).join('');
 }
 
@@ -768,10 +825,17 @@ function renderFinance() {
     const opt=c.items.filter(i=>i.type==='選配').reduce((a,i)=>a+i.price,0);
     const t=getTotal(c.items); const m=t.price>0?Math.round(t.profit/t.price*100):0;
     totalRev+=t.price; totalCost+=t.cost; totalProfit+=t.profit;
-    return `<tr><td class="td-main">${c.id}</td><td>${c.deceased}</td><td>${c.date}</td>
-      <td>${fmt(std)}</td><td>${fmt(opt)}</td><td class="td-gold">${fmt(t.price)}</td>
-      <td style="color:var(--text3)">${fmt(t.cost)}</td><td class="td-green">${fmt(t.profit)}</td>
-      <td style="color:${m>50?'var(--green)':'var(--text2)'};font-weight:500">${m}%</td></tr>`;
+    return `<tr>
+      <td data-label="案件編號" class="td-main">${c.id}</td>
+      <td data-label="往生者">${c.deceased}</td>
+      <td data-label="日期">${c.date}</td>
+      <td data-label="標配">${fmt(std)}</td>
+      <td data-label="選配">${fmt(opt)}</td>
+      <td data-label="總收入" class="td-gold">${fmt(t.price)}</td>
+      <td data-label="總成本" style="color:var(--text3)">${fmt(t.cost)}</td>
+      <td data-label="淨利" class="td-green">${fmt(t.profit)}</td>
+      <td data-label="利潤率" style="color:${m>50?'var(--green)':'var(--text2)'};font-weight:500">${m}%</td>
+    </tr>`;
   }).join('');
   document.getElementById('fin-revenue').textContent=fmt(totalRev);
   document.getElementById('fin-cost').textContent=fmt(totalCost);
