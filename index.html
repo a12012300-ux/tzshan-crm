@@ -604,6 +604,7 @@ td.wrap { white-space: normal; }
 <!-- TOAST -->
 <div id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/solarlunar@2.1.2/solarlunar.min.js"></script>
 <script>
 let cases = JSON.parse(localStorage.getItem('funeral-cases-v2') || '[]');
 let editingId = null;
@@ -626,33 +627,31 @@ function changeFontSize(delta) {
 }
 applyZoom();
 
-// ── 農曆換算（使用瀏覽器 Intl API）──
-function solarToLunarParts(dateStr) {
+// ── 農曆換算（使用 solarlunar 套件，精準民間農曆）──
+function _sl(dateStr) {
   if (!dateStr) return null;
   try {
     const [y, m, d] = dateStr.split('-').map(Number);
     if (isNaN(y) || isNaN(m) || isNaN(d)) return null;
-    const date = new Date(y, m - 1, d);
-    const fmt = new Intl.DateTimeFormat('zh-TW-u-ca-chinese', { year: 'numeric', month: 'long', day: 'numeric' });
-    const parts = fmt.formatToParts(date);
-    return {
-      year:  parts.find(p => p.type === 'year')?.value  || '',
-      month: parts.find(p => p.type === 'month')?.value || '',
-      day:   parts.find(p => p.type === 'day')?.value   || ''
-    };
+    if (typeof solarlunar === 'undefined' || !solarlunar.solar2lunar) return null;
+    const r = solarlunar.solar2lunar(y, m, d);
+    if (!r || !r.IMonthCn || !r.IDayCn || !r.gzYear) return null;
+    return r;
   } catch(e) { return null; }
 }
 
 function lunarFull(dateStr) {
-  const p = solarToLunarParts(dateStr);
-  if (!p) return '';
-  return `農曆 ${p.year} ${p.month}${p.day}`;
+  const r = _sl(dateStr);
+  if (!r) return '';
+  const month = r.IMonthCn.replace('闰', '閏');
+  return `農曆 ${r.gzYear}年 ${month}${r.IDayCn}`;
 }
 
 function lunarShort(dateStr) {
-  const p = solarToLunarParts(dateStr);
-  if (!p) return '';
-  return `農曆 ${p.month}${p.day}`;
+  const r = _sl(dateStr);
+  if (!r) return '';
+  const month = r.IMonthCn.replace('闰', '閏');
+  return `農曆 ${month}${r.IDayCn}`;
 }
 
 // 表單中即時更新農曆提示
